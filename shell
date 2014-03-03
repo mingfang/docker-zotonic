@@ -1,1 +1,1 @@
-docker run -u root -p 8000:8000 -v `pwd`:/docker -rm=true -i -t zotonic /bin/bash
+docker run -e HOST=`hostname` -p 8000:8000 -v `pwd`:/docker -rm=true -i -t zotonic /bin/bash

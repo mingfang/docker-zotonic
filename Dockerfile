@@ -51,10 +51,18 @@ RUN cd /zotonic && \
 ADD . /docker
 RUN ln -s /docker/supervisord-ssh.conf /etc/supervisor/conf.d/supervisord-ssh.conf
 RUN ln -s /docker/supervisord-postgres.conf /etc/supervisor/conf.d/supervisord-postgres.conf
+RUN ln -s /docker/supervisord-zotonic.conf /etc/supervisor/conf.d/supervisord-zotonic.conf
 RUN ln -s /docker/pg_hba.conf /var/lib/postgresql/9.3/main/pg_hba.conf
 
 #Init DB
-RUN supervisord & sleep 3 && \
+RUN sudo -u postgres /usr/lib/postgresql/9.3/bin/postmaster -D /etc/postgresql/9.3/main & sleep 3 && \
     sudo -u postgres psql < /docker/zotonic.ddl 
+
+ENV HOME /root
+#Create basicsite, not working yet
+#RUN sudo -u postgres /usr/lib/postgresql/9.3/bin/postmaster -D /etc/postgresql/9.3/main & sleep 3 && \
+#    /zotonic/bin/zotonic start && \
+#    /zotonic/bin/zotonic addsite -s basicsite localhost
+
 EXPOSE 22
 
