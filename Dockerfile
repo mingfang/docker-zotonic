@@ -21,6 +21,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y vim less net-tools inetuti
 #Dependencies
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y default-jdk build-essential libncurses5-dev openssl libssl-dev fop xsltproc unixodbc-dev
 
+#Postgres
+RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main' > /etc/apt/sources.list.d/pgdg.list
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-9.3
+
 #Erlang
 RUN wget --no-check-certificate https://packages.erlang-solutions.com/erlang/esl-erlang-src/otp_src_R16B03-1.tar.gz && \
     tar xvf otp*tar.gz && \
@@ -38,12 +44,6 @@ RUN wget https://zotonic.googlecode.com/files/zotonic-0.9.4.zip && \
     unzip zotonic*.zip && \
     rm zotonic*.zip
 
-#Postgres
-RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main' > /etc/apt/sources.list.d/pgdg.list
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
-    apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-9.3
-
 RUN cd /zotonic && \
     make
 
@@ -53,7 +53,7 @@ RUN ln -s /docker/supervisord-ssh.conf /etc/supervisor/conf.d/supervisord-ssh.co
 RUN ln -s /docker/supervisord-postgres.conf /etc/supervisor/conf.d/supervisord-postgres.conf
 RUN ln -s /docker/pg_hba.conf /var/lib/postgresql/9.3/main/pg_hba.conf
 
-#Create site
+#Init DB
 RUN supervisord & sleep 3 && \
     sudo -u postgres psql < /docker/zotonic.ddl 
 EXPOSE 22
